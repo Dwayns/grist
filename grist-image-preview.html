@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      padding: 8px;
+      font-family: sans-serif;
+      background: #fafafa;
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .thumb {
+      width: 150px;
+      height: 150px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .thumb img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    .empty {
+      color: #888;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="content" class="empty">Sélectionne un produit</div>
+
+<script>
+  grist.onRecord(function(record) {
+    const container = document.getElementById("content");
+    container.innerHTML = "";
+
+    if (!record || !record.Images) {
+      container.className = "empty";
+      container.textContent = "Aucune image";
+      return;
+    }
+
+    container.className = "gallery";
+
+    const urls = record.Images
+      .split(',')
+      .map(u => u.trim())
+      .filter(u => u.length);
+
+    if (!urls.length) {
+      container.className = "empty";
+      container.textContent = "Aucune image";
+      return;
+    }
+
+    urls.forEach(url => {
+      const div = document.createElement("div");
+      div.className = "thumb";
+
+      const img = document.createElement("img");
+      img.src = url;
+      img.loading = "lazy";
+      img.onclick = () => window.open(url, "_blank");
+
+      div.appendChild(img);
+      container.appendChild(div);
+    });
+  });
+</script>
+
+</body>
+</html>
