@@ -50,6 +50,12 @@
       for (const url of urls) {
         const img = document.createElement("img");
         img.src = url;
+        img.referrerpolicy = "no-referrer";
+        img.alt = "Vignette";
+        img.onerror = () => { 
+          img.style.background = "#f00";  // rouge si échec
+          console.error("Image 403:", url);
+        };
         container.appendChild(img);
       }
     });
