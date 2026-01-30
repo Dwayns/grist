@@ -36,33 +36,40 @@
 
     const container = document.getElementById("container");
 
-    function renderImages(value) {
-      container.innerHTML = "";
-
-      if (!value) {
-        return;
-      }
-
-      const urls = value
-        .split(",")
-        .map(u => u.trim())
-        .filter(Boolean);
-
-      for (const url of urls) {
-        const img = document.createElement("img");
-        img.src = url;
-        img.width = 150;
-        img.height = 150;
-        img.style.objectFit = "contain";
-        img.style.margin = "4px";
-        img.referrerPolicy = "no-referrer";
-
-        container.appendChild(img);
-      }
-    }
-
     grist.onRecord(function(record) {
-      renderImages(record.images);
+
+      function renderImages(value) {
+        const container = document.getElementById("images");
+        if (!container) return; // sécurité Grist
+
+        container.innerHTML = "";
+
+        if (!value) return;
+
+        // accepte :
+        // - une seule URL
+        // - plusieurs URLs séparées par , ou ;
+        const urls = Array.isArray(value)
+          ? value
+          : value.toString().split(/[;,]/).map(u => u.trim()).filter(Boolean);
+
+        for (const url of urls) {
+          const img = document.createElement("img");
+          img.src = url;
+          img.loading = "lazy";
+          img.referrerPolicy = "no-referrer";
+          img.style.maxWidth = "100%";
+          img.style.marginBottom = "6px";
+
+          img.onerror = () => {
+            img.remove(); // évite vignette cassée
+          };
+
+          container.appendChild(img);
+        }
+      }
+
+      renderImages(record.images); // ⚠️ nom exact de la colonne
     });
 
     console.log("Images brutes :", record.Images);
