@@ -37,7 +37,7 @@
     });
 
     grist.onRecord(function(record) {
-      container.innerHTML = "";
+      /*container.innerHTML = "";
 
       if (!record || !record.Images) {
         return;
@@ -49,8 +49,33 @@
         const img = document.createElement("img");
         img.src = url;
         container.appendChild(img);
-      }
+      }*/
 
+      function renderImages(value) {
+        container.innerHTML = "";
+      
+        if (!value) {
+          return;
+        }
+      
+        const urls = value
+          .split(",")
+          .map(u => u.trim())
+          .filter(Boolean);
+      
+        for (const url of urls) {
+          const img = document.createElement("img");
+          img.src = url;
+          img.width = 150;
+          img.height = 150;
+          img.style.objectFit = "contain";
+          img.style.margin = "4px";
+          img.referrerPolicy = "no-referrer"; // ⭐ LA LIGNE IMPORTANTE
+      
+          container.appendChild(img);
+        }
+      } //function renderImages(value)
+      
       renderImages(record.images);
     });
 
