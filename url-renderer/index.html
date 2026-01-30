@@ -57,7 +57,60 @@
 </head>
 
 <body>
-    index.html
+    <div id="content">
+        <div class="error">
+            <div class="error-content">
+                <div class="error-title">Configuration Required</div>
+                <div class="error-message">Select a URL column in the configuration panel</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Grist initialization
+        grist.ready({
+            columns: [{
+                name: "url",
+                title: "URL Column",
+                type: "Text",
+                description: "Column containing URLs to display"
+            }],
+            requiredAccess: "read table"
+        });
+
+        // Content updates
+        grist.onRecord((record, mappings) => {
+            const mapped = grist.mapColumnNames(record);
+            const content = document.getElementById('content');
+
+            if (!mapped || !mapped.url) {
+                content.innerHTML = `
+                    <div class="error">
+                        <div class="error-content">
+                            <div class="error-title">No URL Found</div>
+                            <div class="error-message">The cell is empty or the column is not configured</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Simple URL validation
+            try {
+                new URL(mapped.url);
+                content.innerHTML = `<iframe src="${mapped.url}" title="URL Content"></iframe>`;
+            } catch (e) {
+                content.innerHTML = `
+                    <div class="error">
+                        <div class="error-content">
+                            <div class="error-title">Invalid URL</div>
+                            <div class="error-message">The URL format is not valid</div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
 </body>
 
 </html>
