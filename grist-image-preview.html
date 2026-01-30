@@ -1,91 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
-
+  <meta charset="UTF-8">
+  <title>Image Preview</title>
   <style>
     body {
       margin: 0;
       padding: 8px;
       font-family: sans-serif;
-      background: #fafafa;
+      background: #f8f8f8;
     }
 
-    .gallery {
+    .container {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .thumb {
+    img {
       width: 150px;
       height: 150px;
-      border: 1px solid #ddd;
+      object-fit: cover;
       border-radius: 6px;
-      overflow: hidden;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .thumb img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      cursor: pointer;
+      background: #ddd;
     }
 
     .empty {
-      color: #888;
+      color: #777;
       font-size: 13px;
     }
   </style>
 </head>
-
 <body>
-  <div id="content" class="empty">Sélectionne un produit</div>
 
-  <script>
-    grist.ready({ requiredAccess: "read table" });
+<div id="content" class="empty">
+  Sélectionnez une ligne contenant des images
+</div>
 
-    grist.onRecord(function(record) {
-      const container = document.getElementById("content");
-      container.innerHTML = "";
+<script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+<script>
+  grist.ready({
+    requiredAccess: 'read table'
+  });
 
-      if (!record || !record.Images) {
-        container.className = "empty";
-        container.textContent = "Aucune image";
-        return;
-      }
+  grist.onRecord(function(record) {
+    const container = document.getElementById('content');
+    container.innerHTML = '';
+    container.className = 'container';
 
-      container.className = "gallery";
+    if (!record || !record.Images) {
+      container.className = 'empty';
+      container.textContent = 'Aucune image';
+      return;
+    }
 
-      const urls = record.Images
-        .split(',')
-        .map(u => u.trim())
-        .filter(u => u.length);
+    // Gère 1 image ou plusieurs séparées par virgule
+    const urls = record.Images
+      .split(',')
+      .map(u => u.trim())
+      .filter(Boolean);
 
-      if (!urls.length) {
-        container.className = "empty";
-        container.textContent = "Aucune image";
-        return;
-      }
+    if (!urls.length) {
+      container.className = 'empty';
+      container.textContent = 'Aucune image valide';
+      return;
+    }
 
-      urls.forEach(url => {
-        const div = document.createElement("div");
-        div.className = "thumb";
+    for (const url of urls) {
+      const img = document.createElement('img');
+      img.src = url;
+      img.loading = 'lazy';
+      container.appendChild(img);
+    }
+  });
+</script>
 
-        const img = document.createElement("img");
-        img.src = url;
-        img.loading = "lazy";
-        img.onclick = () => window.open(url, "_blank");
-
-        div.appendChild(img);
-        container.appendChild(div);
-      });
-    });
-  </script>
 </body>
 </html>
