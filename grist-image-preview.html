@@ -36,29 +36,24 @@
       requiredAccess: "read table"
     });
 
-    grist.onRecord(function(record) {
+    grist.onRecords(function(records) {  // ← pluriel !
       container.innerHTML = "";
-
-      if (!record || !record.Images) {
-        return;
-      }
-
-      const urls = record.Images.split(",").map(u => u.trim()).filter(Boolean);
-
-      console.log("Images brutes :", record.Images);
-
-      for (const url of urls) {
-        const img = document.createElement("img");
-        img.src = url;
-        img.referrerpolicy = "no-referrer";
-        img.alt = "Vignette";
-        img.onerror = () => { 
-          img.style.background = "#f00";  // rouge si échec
-          console.error("Image 403:", url);
-        };
-        container.appendChild(img);
-      }
+      
+      records.forEach(record => {
+        if (record.Images) {
+          const urls = record.Images.split(",").map(u=>u.trim()).filter(Boolean);
+          urls.forEach(url => {
+            const img = document.createElement("img");
+            img.src = url;
+            img.referrerpolicy = "no-referrer";
+            img.alt = record.Nom || "Image";  // nom produit
+            container.appendChild(img);
+          });
+        }
+      });
     });
+
+    console.log("Images brutes :", record.Images);
   </script>
 </body>
 </html>
