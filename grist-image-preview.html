@@ -31,7 +31,7 @@
 
     grist.ready({
       columns: [
-        { name: "Images", type: "Text", title: "Images" }
+        { name: "$Images", type: "Text", title: "Images" }
       ],
       requiredAccess: "read table"
     });
@@ -76,7 +76,7 @@
         }
       } //function renderImages(value)
       
-      renderImages(record.images);
+      //renderImages(record.images);
     });
 
     console.log("Images brutes :", record.Images);
