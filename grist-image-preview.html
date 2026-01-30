@@ -6,72 +6,64 @@
   <style>
     body {
       margin: 0;
-      padding: 8px;
+      padding: 10px;
       font-family: sans-serif;
-      background: #f8f8f8;
+      background: #fafafa;
     }
-
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
     img {
       width: 150px;
       height: 150px;
       object-fit: cover;
       border-radius: 6px;
-      background: #ddd;
+      margin: 4px;
     }
-
-    .empty {
-      color: #777;
-      font-size: 13px;
+    .debug {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 8px;
     }
   </style>
 </head>
 <body>
 
-<div id="content" class="empty">
-  Sélectionnez une ligne contenant des images
-</div>
+<div class="debug" id="debug">Widget chargé…</div>
+<div id="content">En attente de sélection…</div>
 
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 <script>
   grist.ready({
-    requiredAccess: 'read table'
+    requiredAccess: 'read table',
+    columns: ['Images']   // 🔴 IMPORTANT
   });
 
   grist.onRecord(function(record) {
-    const container = document.getElementById('content');
-    container.innerHTML = '';
-    container.className = 'container';
+    const debug = document.getElementById('debug');
+    const content = document.getElementById('content');
 
-    if (!record || !record.Images) {
-      container.className = 'empty';
-      container.textContent = 'Aucune image';
+    if (!record) {
+      debug.textContent = 'Aucune ligne sélectionnée';
+      content.innerHTML = '';
       return;
     }
 
-    // Gère 1 image ou plusieurs séparées par virgule
-    const urls = record.Images
-      .split(',')
+    debug.textContent = 'Ligne reçue ✔';
+
+    const images = record.Images;
+    content.innerHTML = '';
+
+    if (!images) {
+      content.textContent = 'Colonne Images vide ou absente';
+      return;
+    }
+
+    images.split(',')
       .map(u => u.trim())
-      .filter(Boolean);
-
-    if (!urls.length) {
-      container.className = 'empty';
-      container.textContent = 'Aucune image valide';
-      return;
-    }
-
-    for (const url of urls) {
-      const img = document.createElement('img');
-      img.src = url;
-      img.loading = 'lazy';
-      container.appendChild(img);
-    }
+      .filter(Boolean)
+      .forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        content.appendChild(img);
+      });
   });
 </script>
 
