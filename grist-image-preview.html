@@ -32,7 +32,8 @@
     grist.ready({
       columns: [
         { name: "Images", type: "Text", title: "Images" }
-      ]
+      ],
+      requiredAccess: "read table"
     });
 
     grist.onRecord(function(record) {
@@ -44,14 +45,14 @@
 
       const urls = record.Images.split(",").map(u => u.trim()).filter(Boolean);
 
+      console.log("Images brutes :", record.Images);
+
       for (const url of urls) {
         const img = document.createElement("img");
         img.src = url;
         container.appendChild(img);
       }
     });
-
-    console.log("Images brutes :", record.Images);
   </script>
 </body>
 </html>
