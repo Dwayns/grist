@@ -36,24 +36,73 @@
       requiredAccess: "read table"
     });
 
-    grist.onRecords(function(records) {  // ← pluriel !
-      container.innerHTML = "";
-      
-      records.forEach(record => {
-        if (record.Images) {
-          const urls = record.Images.split(",").map(u=>u.trim()).filter(Boolean);
-          urls.forEach(url => {
-            const img = document.createElement("img");
-            img.src = url;
-            img.referrerpolicy = "no-referrer";
-            img.alt = record.Nom || "Image";  // nom produit
-            container.appendChild(img);
-          });
-        }
-      });
-    });
+    grist.onRecords(function(records, mappings) {  // ← pluriel !
+      const table = document.getElementById("data-table");
+      if (!table) return;
 
-    console.log("Images brutes :", record.Images);
+      const thead = table.querySelector("thead");
+      const tbody = table.querySelector("tbody");
+
+      thead.innerHTML = "";
+      tbody.innerHTML = "";
+
+      if (!records || !records.length) return;
+      // Colonnes visibles
+      const columns = Object.keys(records[0]);
+
+      /* =========================
+        HEADER
+      ========================= */
+      const trHead = document.createElement("tr");
+
+      for (const col of columns) {
+        const th = document.createElement("th");
+        th.textContent = col;
+        trHead.appendChild(th);
+      }
+
+      thead.appendChild(trHead);
+
+      /* =========================
+        ROWS
+      ========================= */
+      for (const record of records) {
+        const tr = document.createElement("tr");
+
+        for (const col of columns) {
+          const td = document.createElement("td");
+          td.textContent = record[col] ?? "";
+          tr.appendChild(td);
+        }
+
+        // Colonne image
+        const tdImg = document.createElement("td");
+
+        if (record.Images) {
+          const urls = record.Images
+            .toString()
+            .split(/[;,]/)
+            .map(u => u.trim())
+            .filter(Boolean);
+
+          if (urls.length) {
+            const img = document.createElement("img");
+            img.src = urls[0]; // image principale
+            img.loading = "lazy";
+            img.referrerPolicy = "no-referrer";
+            img.style.maxWidth = "80px";
+            img.style.maxHeight = "80px";
+            img.onerror = () => img.remove();
+
+            tdImg.appendChild(img);
+          }
+        }
+
+        tr.appendChild(tdImg);
+        tbody.appendChild(tr);
+      }
+
+    });
   </script>
 </body>
 </html>
