@@ -36,9 +36,57 @@
     });
 
     grist.onRecords(function(records, mappings) {
-      console.log("---RECORDS---:", records);
-      console.log("---MAPPINGS---:", mappings);
-    });
+
+  const table = document.getElementById("data-table");
+  if (!table || !records || !records.length) return;
+
+  const thead = table.querySelector("thead");
+  const tbody = table.querySelector("tbody");
+
+  thead.innerHTML = "";
+  tbody.innerHTML = "";
+
+  const columns = Object.keys(records[0]);
+
+  // HEADER
+  const trHead = document.createElement("tr");
+  for (const col of columns) {
+    const th = document.createElement("th");
+    th.textContent = col;
+    trHead.appendChild(th);
+  }
+  const thImg = document.createElement("th");
+  thImg.textContent = "Image";
+  trHead.appendChild(thImg);
+  thead.appendChild(trHead);
+
+  // ROWS
+  for (const record of records) {
+    const tr = document.createElement("tr");
+
+    for (const col of columns) {
+      const td = document.createElement("td");
+      td.textContent = record[col] ?? "";
+      tr.appendChild(td);
+    }
+
+    const tdImg = document.createElement("td");
+
+    const imgValue = record[mappings.Images?.colId];
+    if (imgValue) {
+      const img = document.createElement("img");
+      img.src = imgValue;
+      img.style.maxWidth = "80px";
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => img.remove();
+      tdImg.appendChild(img);
+    }
+
+    tr.appendChild(tdImg);
+    tbody.appendChild(tr);
+  }
+});
 
   </script>
 </body>
