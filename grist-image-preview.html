@@ -27,55 +27,41 @@
   <div class="thumbs" id="thumbs"></div>
 
   <script>
-    const container = document.getElementById("thumbs");
-
     grist.ready({
       columns: [
-        { name: "$Images", type: "Text", title: "Images" }
+        { name: "images", title: "Images", type: "Text" }
       ],
       requiredAccess: "read table"
     });
 
-    grist.onRecord(function(record) {
-      /*container.innerHTML = "";
+    const container = document.getElementById("container");
 
-      if (!record || !record.Images) {
+    function renderImages(value) {
+      container.innerHTML = "";
+
+      if (!value) {
         return;
       }
 
-      const urls = record.Images.split(",").map(u => u.trim()).filter(Boolean);
+      const urls = value
+        .split(",")
+        .map(u => u.trim())
+        .filter(Boolean);
 
       for (const url of urls) {
         const img = document.createElement("img");
         img.src = url;
-        container.appendChild(img);
-      }*/
+        img.width = 150;
+        img.height = 150;
+        img.style.objectFit = "contain";
+        img.style.margin = "4px";
+        img.referrerPolicy = "no-referrer";
 
-      function renderImages(value) {
-        container.innerHTML = "";
-      
-        if (!value) {
-          return;
-        }
-      
-        const urls = value
-          .split(",")
-          .map(u => u.trim())
-          .filter(Boolean);
-      
-        for (const url of urls) {
-          const img = document.createElement("img");
-          img.src = url;
-          img.width = 150;
-          img.height = 150;
-          img.style.objectFit = "contain";
-          img.style.margin = "4px";
-          img.referrerPolicy = "no-referrer"; // ⭐ LA LIGNE IMPORTANTE
-      
-          container.appendChild(img);
-        }
-      } //function renderImages(value)
-      
+        container.appendChild(img);
+      }
+    }
+
+    grist.onRecord(function(record) {
       renderImages(record.images);
     });
 
