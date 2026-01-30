@@ -29,14 +29,6 @@
   <script>
     const container = document.getElementById("thumbs");
 
-    const img = document.createElement("img");
-      img.src = url;
-      img.width = 150;
-      img.height = 150;
-      img.style.objectFit = "contain";
-      img.referrerPolicy = "no-referrer";
-
-
     grist.ready({
       columns: [
         { name: "Images", type: "Text", title: "Images" }
@@ -55,6 +47,10 @@
       for (const url of urls) {
         const img = document.createElement("img");
         img.src = url;
+        img.width = 150;
+        img.height = 150;
+        img.style.objectFit = "contain";
+        img.referrerPolicy = "no-referrer";
         container.appendChild(img);
       }
     });
