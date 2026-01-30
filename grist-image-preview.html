@@ -27,49 +27,56 @@
   <div class="thumbs" id="thumbs"></div>
 
   <script>
+    const container = document.getElementById("thumbs");
+
     grist.ready({
       columns: [
-        { name: "images", title: "Images", type: "Text" }
+        { name: "$Images", type: "Text", title: "Images" }
       ],
       requiredAccess: "read table"
     });
 
-    const container = document.getElementById("container");
-
     grist.onRecord(function(record) {
+      container.innerHTML = "";
 
-      function renderImages(value) {
-        const container = document.getElementById("images");
-        if (!container) return; // sécurité Grist
+      if (!record || !record.Images) {
+        return;
+      }
 
+      const urls = record.Images.split(",").map(u => u.trim()).filter(Boolean);
+
+      for (const url of urls) {
+        const img = document.createElement("img");
+        img.src = url;
+        container.appendChild(img);
+      }
+
+      /*function renderImages(value) {
         container.innerHTML = "";
-
-        if (!value) return;
-
-        // accepte :
-        // - une seule URL
-        // - plusieurs URLs séparées par , ou ;
-        const urls = Array.isArray(value)
-          ? value
-          : value.toString().split(/[;,]/).map(u => u.trim()).filter(Boolean);
-
+      
+        if (!value) {
+          return;
+        }
+      
+        const urls = value
+          .split(",")
+          .map(u => u.trim())
+          .filter(Boolean);
+      
         for (const url of urls) {
           const img = document.createElement("img");
           img.src = url;
-          img.loading = "lazy";
+          img.width = 150;
+          img.height = 150;
+          img.style.objectFit = "contain";
+          img.style.margin = "4px";
           img.referrerPolicy = "no-referrer";
-          img.style.maxWidth = "100%";
-          img.style.marginBottom = "6px";
-
-          img.onerror = () => {
-            img.remove(); // évite vignette cassée
-          };
-
+      
           container.appendChild(img);
         }
-      }
-
-      renderImages(record.images); // ⚠️ nom exact de la colonne
+      } //function renderImages(value)
+      
+      renderImages(record.images);*/
     });
 
     console.log("Images brutes :", record.Images);
